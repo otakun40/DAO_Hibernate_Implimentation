@@ -5,20 +5,18 @@ import jm.task.core.jdbc.util.Util;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
-    private SessionFactory sessionFactory;
-    private Session session;
+    private final SessionFactory sessionFactory = Util.getSessionFactory();
     public UserDaoHibernateImpl() {
 
     }
 
-
     @Override
     public void createUsersTable() {
-        sessionFactory = Util.getSessionFactory();
-        session = sessionFactory.getCurrentSession();
+        Session session = sessionFactory.getCurrentSession();
         session.beginTransaction();
         session.createSQLQuery("CREATE TABLE IF NOT EXISTS users(" +
                 "id INT PRIMARY KEY AUTO_INCREMENT," +
@@ -26,53 +24,59 @@ public class UserDaoHibernateImpl implements UserDao {
                 "lastName VARCHAR(255)," +
                 "age INT)").executeUpdate();
         session.getTransaction().commit();
+        session.close();
     }
 
     @Override
     public void dropUsersTable() {
-        sessionFactory = Util.getSessionFactory();
-        session = sessionFactory.getCurrentSession();
+        Session session = sessionFactory.getCurrentSession();
         session.beginTransaction();
         session.createSQLQuery("DROP TABLE IF EXISTS users").executeUpdate();
         session.getTransaction().commit();
+        session.close();
     }
 
+
     @Override
+    @Transactional(rollbackOn = org.hibernate.HibernateException.class)
     public void saveUser(String name, String lastName, byte age) {
-        sessionFactory = Util.getSessionFactory();
-        session = sessionFactory.getCurrentSession();
+        Session session = sessionFactory.getCurrentSession();
         session.beginTransaction();
         session.persist(new User(name, lastName, age));
         session.getTransaction().commit();
+        session.close();
     }
 
     @Override
+    @Transactional(rollbackOn = org.hibernate.HibernateException.class)
     public void removeUserById(long id) {
-        sessionFactory = Util.getSessionFactory();
-        session = sessionFactory.getCurrentSession();
+        Session session = sessionFactory.getCurrentSession();
         session.beginTransaction();
         User user = session.get(User.class, id);
         session.remove(user);
         session.getTransaction().commit();
+        session.close();
     }
 
     @Override
+    @Transactional(rollbackOn = org.hibernate.HibernateException.class)
     public List<User> getAllUsers() {
         List<User> result;
-        sessionFactory = Util.getSessionFactory();
-        session = sessionFactory.getCurrentSession();
+        Session session = sessionFactory.getCurrentSession();
         session.beginTransaction();
         result = session.createQuery("SELECT u FROM User u", User.class).getResultList();
         session.getTransaction().commit();
+        session.close();
         return result;
     }
 
     @Override
+    @Transactional(rollbackOn = org.hibernate.HibernateException.class)
     public void cleanUsersTable() {
-        sessionFactory = Util.getSessionFactory();
-        session = sessionFactory.getCurrentSession();
+        Session session = sessionFactory.getCurrentSession();
         session.beginTransaction();
         session.createQuery("DELETE FROM User u").executeUpdate();
         session.getTransaction().commit();
+        session.close();
     }
 }
