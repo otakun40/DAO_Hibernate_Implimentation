@@ -15,7 +15,6 @@ public class UserDaoHibernateImpl implements UserDao {
     }
 
     @Override
-    @Transactional(rollbackOn = org.hibernate.HibernateException.class)
     public void createUsersTable() {
         try (Session session = sessionFactory.getCurrentSession()){
             session.beginTransaction();
@@ -29,7 +28,6 @@ public class UserDaoHibernateImpl implements UserDao {
     }
 
     @Override
-    @Transactional(rollbackOn = org.hibernate.HibernateException.class)
     public void dropUsersTable() {
         try (Session session = sessionFactory.getCurrentSession()) {
             session.beginTransaction();
