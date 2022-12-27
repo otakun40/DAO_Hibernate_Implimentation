@@ -59,6 +59,7 @@ public class UserDaoHibernateImpl implements UserDao {
     }
 
     @Override
+    @Transactional(rollbackOn = org.hibernate.HibernateException.class)
     public List<User> getAllUsers() {
         List<User> result;
         try (Session session = sessionFactory.getCurrentSession()) {
